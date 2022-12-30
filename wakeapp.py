@@ -205,7 +205,7 @@ clientside_callback(
             primaryColor: "indigo"
         }
     }""",
-    Output("theme-provider", "theme"),
+    Output("theme-provider-1", "theme"),
     Input("color-scheme-toggle", "value"),
 )
 
