@@ -89,6 +89,19 @@ app.layout = dmc.MantineProvider(
                                                 ),
                                                 dmc.Stack(
                                                     [
+                                                        #dmc.Select(
+                                                        #    label="Выберите шаблон пользователя:",
+                                                        #    placeholder="",
+                                                        #    id="user-select",
+                                                        #    searchable=False,
+                                                        #    persistence=True,
+                                                        #    #value="emir_m@tvsi.ru",
+                                                        #    data=[
+                                                        #        {"value": "4C-CC-6A-00-B9-4E", "label": "emir_m@tvsi.ru"},
+                                                        #        {"value": "b4:2e:99:e1:b1:12", "label": "lhagva@tvsi.ru"},
+                                                        #    ],
+                                                        #    style={"width": 250},
+                                                        #),
                                                         dmc.TextInput(
                                                             label="Введите MAC-адрес хоста:",
                                                             id="input-mac-adress",
@@ -98,7 +111,7 @@ app.layout = dmc.MantineProvider(
                                                             required=True,
                                                         ),
                                                         dmc.TextInput(
-                                                            label="Введите IP-адрес хоста:",
+                                                            label="Введите IP-адрес:",
                                                             id="input-ip-adress",
                                                             style={"width": 250},
                                                             placeholder="255.255.255.255",
@@ -106,7 +119,7 @@ app.layout = dmc.MantineProvider(
                                                             icon=[DashIconify(icon="material-symbols:bring-your-own-ip")],
                                                         ),
                                                         dmc.NumberInput(
-                                                            label="Введите порт хоста:",
+                                                            label="Введите порт:",
                                                             description="Опционально",
                                                             id="input-port",
                                                             value=9,
@@ -143,6 +156,17 @@ app.layout = dmc.MantineProvider(
     ],
 )
 
+
+""" @app.callback(
+    Output("user-select", "value"),
+    Input("input-mac-adress", "value"),
+    prevent_initial_call=True,
+)
+def choose_default(preset):
+    print(preset)
+    return preset
+ """
+
 @app.callback(
     Output("wol-status-text", "children"),
     [Input("submit-wol", "n_clicks"),
@@ -152,24 +176,24 @@ app.layout = dmc.MantineProvider(
     prevent_initial_call=True,
 )
 def send_wol(n_clicks, mac, ip, port):
-    
-    if re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", mac.lower()):
-        
-        if ip == None or ip == '':
-            ip = '255.255.255.255'
-        if port == None:
-            port = 9
-        
-        if iptools.ipv4.validate_ip(ip):
-            print(mac, ip, port)
-            send_magic_packet(mac, ip_address=str(ip), port=port)
-            current_time = datetime.now().strftime("%H:%M:%S")
-            return f"Статус запроса: отправлен {current_time}"
+    if mac:
+        if re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", mac.lower()):
+            
+            if ip == None or ip == '':
+                ip = '255.255.255.255'
+            if port == None:
+                port = 9
+            
+            if iptools.ipv4.validate_ip(ip):
+                print(mac, ip, port)
+                send_magic_packet(mac, ip_address=str(ip), port=port)
+                current_time = datetime.now().strftime("%H:%M:%S")
+                return f"Статус запроса: отправлен {current_time}"
+            else:
+                return "Некорректный формат IP-адреса"
+            
         else:
-            return "Некорректный формат IP-адреса"
-        
-    else:
-        return "Некорректный формат MAC"
+            return "Некорректный формат MAC"
 
 
 clientside_callback(
