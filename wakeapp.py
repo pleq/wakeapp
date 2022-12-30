@@ -8,6 +8,8 @@ from paste.translogger import TransLogger
 import iptools
 import re
 from datetime import datetime
+import logging
+logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
 logger_format = ('%(REMOTE_ADDR)s - %(REMOTE_USER)s [%(time)s] '
                  '"%(REQUEST_METHOD)s %(REQUEST_URI)s %(HTTP_VERSION)s" '
@@ -135,8 +137,8 @@ app.layout = dmc.MantineProvider(
                                                     variant="outline", compact=False,
                                                     n_clicks=0, size="sm", disabled=False,
                                                 ),
-                                                html.Br(),
-                                                dmc.Text("Статус запроса: не отправлен", id="wol-status-text", color="dimmed")
+                                                dmc.Text("Статус запроса:", color="dimmed"),
+                                                dmc.Text("Не отправлялся", id="wol-status-text", color="dimmed")
                                             ],
                                             direction="column", spacing="xl", align="center"
                                         )
@@ -185,10 +187,10 @@ def send_wol(n_clicks, mac, ip, port):
                 port = 9
             
             if iptools.ipv4.validate_ip(ip):
-                print(mac, ip, port)
                 send_magic_packet(mac, ip_address=str(ip), port=port)
+                logging.info(f"sent {mac}, {ip}, {port}")
                 current_time = datetime.now().strftime("%H:%M:%S")
-                return f"Статус запроса: отправлен {current_time}"
+                return f"Отправлен {current_time}"
             else:
                 return "Некорректный формат IP-адреса"
             
